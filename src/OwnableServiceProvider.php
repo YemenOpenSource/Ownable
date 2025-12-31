@@ -49,10 +49,6 @@ class OwnableServiceProvider extends ServiceProvider
             $this->publishes([
                 dirname(__DIR__).'/config/ownable.php' => config_path('ownable.php'),
             ], 'ownable-config');
-
-            $this->publishes([
-                dirname(__DIR__).'/database/migrations' => database_path('migrations'),
-            ], 'ownable-migrations');
         }
 
         $this->loadMigrationsFrom(dirname(__DIR__).'/database/migrations');
