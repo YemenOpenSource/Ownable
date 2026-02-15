@@ -15,6 +15,7 @@ class CreateOwnableModelRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => 'required|string|unique:ownable_models,name',
             'model_class' => 'required|string|unique:ownable_models,model_class',
             'description' => 'nullable|string',
             'is_active' => 'boolean',

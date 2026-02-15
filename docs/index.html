@@ -166,17 +166,6 @@
                     <div class="bg-white p-8 rounded-xl shadow-sm border">
                         <div class="flex items-center mb-4">
                             <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mr-3">Step 2</span>
-                            <h3 class="text-xl font-semibold">Publish Configuration</h3>
-                        </div>
-                        <p class="text-gray-600 mb-4">Publish the package configuration to your application:</p>
-                        <div class="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto">
-                            <code>php artisan vendor:publish --provider="Sowailem\Ownable\OwnableServiceProvider" --tag="ownable-config"</code>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white p-8 rounded-xl shadow-sm border">
-                        <div class="flex items-center mb-4">
-                            <span class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full mr-3">Step 3</span>
                             <h3 class="text-xl font-semibold">Run Migration</h3>
                         </div>
                         <p class="text-gray-600 mb-4">Execute the migration to create the database tables:</p>
@@ -295,7 +284,9 @@ Owner::transfer($oldOwner, $newOwner, $post);</code></pre>
     "ownership": {
         "id": 45,
         "owner_id": 1,
-        "owner_type": "App\\Models\\User",
+        "owner_type": "User",
+        "ownable_id": 1,
+        "ownable_type": "Post",
         "is_current": true,
         "owner": {
             "id": 1,
@@ -409,7 +400,7 @@ Owner::transfer($oldOwner, $newOwner, $post);</code></pre>
                             <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownable-models</h4>
                             <p class="text-gray-600 mb-2">Register a new model class for automatic ownership attachment dynamically.</p>
                             <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
-                                <strong>Payload:</strong> model_class, description, is_active
+                                <strong>Payload:</strong> name, model_class, description, is_active
                             </div>
                         </div>
                     </div>
@@ -474,10 +465,11 @@ if (Owner::check($project, $task)) {
                                 <pre><code class="text-sm">// Request to register a new model class
 POST /api/ownable/ownable-models
 {
+    "name": "Document",
     "model_class": "App\\Models\\Document",
     "description": "Client documents"
 }</code></pre>
-                            </div>
+                        </div>
                         </div>
                     </div>
                 </div>

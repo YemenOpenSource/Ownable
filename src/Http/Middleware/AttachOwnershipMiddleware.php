@@ -16,11 +16,11 @@ use Sowailem\Ownable\Services\OwnableModelService;
 class AttachOwnershipMiddleware
 {
     /**
-     * Ownable models cache.
+     * Ownable models aliases (class => name).
      *
      * @var array
      */
-    protected $ownableModels;
+    protected $ownableModelAliases;
 
     /**
      * @var \Sowailem\Ownable\Services\OwnershipService
@@ -51,7 +51,7 @@ class AttachOwnershipMiddleware
      */
     public function handle(Request $request, Closure $next): mixed
     {
-        $this->ownableModels = $this->ownableModelService->getActiveModelClasses();
+        $this->ownableModelAliases = $this->ownableModelService->getActiveModelClassesWithNames();
 
         $response = $next($request);
 
@@ -84,12 +84,25 @@ class AttachOwnershipMiddleware
             $class = get_class($data);
             $key = config('ownable.automatic_attachment.key', 'ownership');
             
-            if (in_array($class, $this->ownableModels)) {
+            if (isset($this->ownableModelAliases[$class])) {
                 $ownership = $this->ownershipService->getCurrentOwnership($class, $data->getKey());
 
                 if ($ownership) {
                     $array = $data->toArray();
-                    $array[$key] = $ownership->toArray();
+                    $ownershipArray = $ownership->toArray();
+                    
+                    // Replace class names with unique names
+                    if (isset($this->ownableModelAliases[$ownershipArray['ownable_type']])) {
+                        $ownershipArray['ownable_type'] = $this->ownableModelAliases[$ownershipArray['ownable_type']];
+                    }
+                    
+                    if (isset($this->ownableModelAliases[$ownershipArray['owner_type']])) {
+                        $ownershipArray['owner_type'] = $this->ownableModelAliases[$ownershipArray['owner_type']];
+                    } else {
+                        $ownershipArray['owner_type'] = class_basename($ownershipArray['owner_type']);
+                    }
+
+                    $array[$key] = $ownershipArray;
                     return $array;
                 }
             }

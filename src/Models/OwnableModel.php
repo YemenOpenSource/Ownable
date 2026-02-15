@@ -29,6 +29,7 @@ class OwnableModel extends Model
      * @var array<string>
      */
     protected $fillable = [
+        'name',
         'model_class',
         'description',
         'is_active',

@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('ownable_models', function (Blueprint $table) {
             $table->id();
             $table->string('model_class')->unique();
+            $table->string('name')->unique();
             $table->string('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();

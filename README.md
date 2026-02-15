@@ -124,9 +124,9 @@ After (Automatic):
     "ownership": {
         "id": 45,
         "owner_id": 1,
-        "owner_type": "App\\Models\\User",
+        "owner_type": "User",
         "ownable_id": 1,
-        "ownable_type": "App\\Models\\Post",
+        "ownable_type": "Post",
         "is_current": true,
         "owner": {
             "id": 1,
@@ -183,7 +183,7 @@ Register models as "ownable" on the fly without changing code:
 ```bash
 curl -X POST http://your-app.test/api/ownable/ownable-models \
      -H "Content-Type: application/json" \
-     -d '{"model_class": "App\\Models\\Document", "description": "Client documents"}'
+     -d '{"name": "Document", "model_class": "App\\Models\\Document", "description": "Client documents"}'
 ```
 Now, all `Document` models returned in APIs will automatically include ownership data.
 
