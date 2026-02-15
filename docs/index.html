@@ -384,10 +384,42 @@ Owner::transfer($oldOwner, $newOwner, $post);</code></pre>
                     
                     <div class="space-y-6">
                         <div class="border-l-4 border-indigo-500 pl-6">
-                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships</h4>
-                            <p class="text-gray-600 mb-2">Register a new ownership relationship manually.</p>
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships/give</h4>
+                            <p class="text-gray-600 mb-2">Give ownership of an ownable entity to an owner.</p>
                             <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
                                 <strong>Payload:</strong> owner_id, owner_type, ownable_id, ownable_type
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-indigo-500 pl-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships/transfer</h4>
+                            <p class="text-gray-600 mb-2">Transfer ownership from one owner to another.</p>
+                            <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
+                                <strong>Payload:</strong> from_owner_id, from_owner_type, to_owner_id, to_owner_type, ownable_id, ownable_type
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-indigo-500 pl-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships/check</h4>
+                            <p class="text-gray-600 mb-2">Check if an owner owns a specific entity.</p>
+                            <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
+                                <strong>Payload:</strong> owner_id, owner_type, ownable_id, ownable_type
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-indigo-500 pl-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships/remove</h4>
+                            <p class="text-gray-600 mb-2">Remove ownership of an entity.</p>
+                            <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
+                                <strong>Payload:</strong> ownable_id, ownable_type
+                            </div>
+                        </div>
+
+                        <div class="border-l-4 border-indigo-500 pl-6">
+                            <h4 class="text-lg font-semibold text-gray-800 mb-2">POST /api/ownable/ownerships/current</h4>
+                            <p class="text-gray-600 mb-2">Get the current owner of an entity.</p>
+                            <div class="bg-gray-100 p-3 rounded text-sm text-gray-700">
+                                <strong>Payload:</strong> ownable_id, ownable_type
                             </div>
                         </div>
                         

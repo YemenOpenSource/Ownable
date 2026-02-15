@@ -3,9 +3,8 @@
 namespace Sowailem\Ownable\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class CreateOwnershipRequest extends FormRequest
+class RemoveOwnershipRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,8 +14,6 @@ class CreateOwnershipRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'owner_id' => 'required',
-            'owner_type' => 'required|string',
             'ownable_id' => 'required',
             'ownable_type' => 'required|string',
         ];

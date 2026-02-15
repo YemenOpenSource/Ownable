@@ -205,7 +205,11 @@ The package provides several endpoints for managing ownership (prefixed by `api/
 
 ### Ownership Records
 - `GET /api/ownable/ownerships`: List and filter ownership history.
-- `POST /api/ownable/ownerships`: Manually register a new ownership relationship.
+- `POST /api/ownable/ownerships/give`: Give ownership of an ownable entity to an owner.
+- `POST /api/ownable/ownerships/transfer`: Transfer ownership from one owner to another.
+- `POST /api/ownable/ownerships/check`: Check if an owner owns a specific entity.
+- `POST /api/ownable/ownerships/remove`: Remove ownership of an entity.
+- `POST /api/ownable/ownerships/current`: Get the current owner of an entity.
 
 ### Ownable Models (Dynamic Registration)
 - `GET /api/ownable/ownable-models`: List models registered for automatic attachment.

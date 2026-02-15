@@ -3,9 +3,8 @@
 namespace Sowailem\Ownable\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class CreateOwnershipRequest extends FormRequest
+class CheckOwnershipRequest extends FormRequest
 {
     public function authorize(): bool
     {

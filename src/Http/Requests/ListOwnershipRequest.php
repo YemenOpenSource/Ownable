@@ -9,7 +9,7 @@ class ListOwnershipRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return Gate::allows('view-ownerships');
+        return true;
     }
 
     public function rules(): array

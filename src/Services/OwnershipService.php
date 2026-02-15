@@ -77,4 +77,50 @@ class OwnershipService
 
         return $ownership;
     }
+
+    /**
+     * Transfer ownership of an ownable entity.
+     *
+     * @param array $data
+     * @return \Sowailem\Ownable\Models\Ownership
+     */
+    public function transferOwnership(array $data): Ownership
+    {
+        return $this->storeOwnership([
+            'owner_id' => $data['to_owner_id'],
+            'owner_type' => $data['to_owner_type'],
+            'ownable_id' => $data['ownable_id'],
+            'ownable_type' => $data['ownable_type'],
+        ]);
+    }
+
+    /**
+     * Check if an owner owns a specific ownable entity.
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function checkOwnership(array $data): bool
+    {
+        return Ownership::where('owner_id', $data['owner_id'])
+            ->where('owner_type', $data['owner_type'])
+            ->where('ownable_id', $data['ownable_id'])
+            ->where('ownable_type', $data['ownable_type'])
+            ->where('is_current', true)
+            ->exists();
+    }
+
+    /**
+     * Remove ownership of an ownable entity.
+     *
+     * @param array $data
+     * @return bool
+     */
+    public function removeOwnership(array $data): bool
+    {
+        return (bool) Ownership::where('ownable_id', $data['ownable_id'])
+            ->where('ownable_type', $data['ownable_type'])
+            ->where('is_current', true)
+            ->update(['is_current' => false]);
+    }
 }

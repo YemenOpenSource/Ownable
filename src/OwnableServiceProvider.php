@@ -87,8 +87,12 @@ class OwnableServiceProvider extends ServiceProvider
             'prefix' => config('ownable.routes.prefix', 'api/ownable'),
             'middleware' => config('ownable.routes.middleware', ['api']),
         ], function () {
-            Route::post('ownerships', \Sowailem\Ownable\Http\Controllers\Ownership\CreateOwnershipController::class);
             Route::get('ownerships', \Sowailem\Ownable\Http\Controllers\Ownership\ListOwnershipController::class);
+            Route::post('ownerships/give', \Sowailem\Ownable\Http\Controllers\Ownership\GiveOwnershipController::class);
+            Route::post('ownerships/transfer', \Sowailem\Ownable\Http\Controllers\Ownership\TransferOwnershipController::class);
+            Route::post('ownerships/check', \Sowailem\Ownable\Http\Controllers\Ownership\CheckOwnershipController::class);
+            Route::post('ownerships/remove', \Sowailem\Ownable\Http\Controllers\Ownership\RemoveOwnershipController::class);
+            Route::post('ownerships/current', \Sowailem\Ownable\Http\Controllers\Ownership\GetCurrentOwnerController::class);
 
             Route::get('ownable-models', \Sowailem\Ownable\Http\Controllers\OwnableModel\ListOwnableModelController::class);
             Route::post('ownable-models', \Sowailem\Ownable\Http\Controllers\OwnableModel\CreateOwnableModelController::class);

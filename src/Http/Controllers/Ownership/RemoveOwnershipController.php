@@ -3,10 +3,10 @@
 namespace Sowailem\Ownable\Http\Controllers\Ownership;
 
 use Illuminate\Routing\Controller;
-use Sowailem\Ownable\Http\Requests\CreateOwnershipRequest;
+use Sowailem\Ownable\Http\Requests\RemoveOwnershipRequest;
 use Sowailem\Ownable\Services\OwnershipService;
 
-class CreateOwnershipController extends Controller
+class RemoveOwnershipController extends Controller
 {
     /**
      * @var \Sowailem\Ownable\Services\OwnershipService
@@ -22,18 +22,18 @@ class CreateOwnershipController extends Controller
     }
 
     /**
-     * Register a new ownership record.
+     * Remove ownership of an ownable entity.
      *
-     * @param  \Sowailem\Ownable\Http\Requests\CreateOwnershipRequest  $request
+     * @param  \Sowailem\Ownable\Http\Requests\RemoveOwnershipRequest  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function __invoke(CreateOwnershipRequest $request)
+    public function __invoke(RemoveOwnershipRequest $request)
     {
-        $ownership = $this->ownershipService->storeOwnership($request->validated());
+        $removed = $this->ownershipService->removeOwnership($request->validated());
 
         return response()->json([
-            'message' => 'Ownership registered successfully.',
-            'data' => $ownership
-        ], 201);
+            'message' => $removed ? 'Ownership removed successfully.' : 'No current ownership found to remove.',
+            'success' => $removed
+        ], 200);
     }
 }
