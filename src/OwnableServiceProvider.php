@@ -5,8 +5,8 @@ namespace Sowailem\Ownable;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Http\Kernel;
-use Sowailem\Ownable\Http\Middleware\AttachOwnershipMiddleware;
+//use Illuminate\Contracts\Http\Kernel;
+//use Sowailem\Ownable\Http\Middleware\AttachOwnershipMiddleware;
 
 /**
  * Service provider for the Ownable package.
@@ -63,6 +63,53 @@ class OwnableServiceProvider extends ServiceProvider
         Blade::if('owns', function ($owner, $ownable) {
             return app('ownable.owner')->check($owner, $ownable);
         });
+
+        $this->registerMacros();
+    }
+
+    /**
+     * Register the dynamic macros for ownable models.
+     *
+     * @return void
+     */
+    protected function registerMacros(): void
+    {
+        $ownableModels = (array) config('ownable.ownable_models', []);
+
+        // Load models from database if table exists
+        try {
+            if (\Illuminate\Support\Facades\Schema::hasTable('ownable_models')) {
+                $dbModels = \Sowailem\Ownable\Models\OwnableModel::where('is_active', true)
+                    ->pluck('model_class')
+                    ->toArray();
+                $ownableModels = array_unique(array_merge($ownableModels, $dbModels));
+            }
+        } catch (\Exception $e) {
+            // Silently fail if a database is not reachable or other issues
+        }
+
+        $ownerModel = config('ownable.owner_model');
+        $macroName = config('ownable.macro_name', 'owner');
+
+        foreach ($ownableModels as $modelClass) {
+            if (class_exists($modelClass)) {
+                $modelClass::macro($macroName, function () use ($ownerModel) {
+                    /** @var \Illuminate\Database\Eloquent\Model $this */
+                    return $this->morphToMany($ownerModel, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
+                        ->wherePivot('is_current', true)
+                        ->withPivot('is_current')
+                        ->withTimestamps();
+                });
+
+                // Also register a macro for ownership history
+                $modelClass::macro($macroName . 'History', function () use ($ownerModel) {
+                    /** @var \Illuminate\Database\Eloquent\Model $this */
+                    return $this->morphToMany($ownerModel, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
+                        ->withPivot('is_current')
+                        ->withTimestamps();
+                });
+            }
+        }
     }
 
     /**
@@ -72,8 +119,8 @@ class OwnableServiceProvider extends ServiceProvider
      */
     protected function registerMiddleware(): void
     {
-        $kernel = $this->app->make(Kernel::class);
-        $kernel->pushMiddleware(AttachOwnershipMiddleware::class);
+//        $kernel = $this->app->make(Kernel::class);
+//        $kernel->pushMiddleware(AttachOwnershipMiddleware::class);
     }
 
     /**
