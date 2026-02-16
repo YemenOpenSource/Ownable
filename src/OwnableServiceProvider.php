@@ -74,8 +74,14 @@ class OwnableServiceProvider extends ServiceProvider
      */
     protected function registerMacros(): void
     {
-        $ownableModels = (array) config('ownable.ownable_models', []);
+        $ownerModels = (array) config('ownable.owner_models', []);
+        // Backwards compatibility or single model config
+        if ($ownerModel = config('ownable.owner_model')) {
+            $ownerModels[] = $ownerModel;
+        }
 
+        $ownableModels = (array) config('ownable.ownable_models', []);
+        
         // Load models from database if table exists
         try {
             if (\Illuminate\Support\Facades\Schema::hasTable('ownable_models')) {
@@ -88,11 +94,25 @@ class OwnableServiceProvider extends ServiceProvider
             // Silently fail if a database is not reachable or other issues
         }
 
-        $ownerModels = config('ownable.owner_models',[]);
-        $macroName = config('ownable.macro_name', 'owner');
-
         $allModels = array_unique(array_merge($ownerModels, $ownableModels));
-        // Register macro for owner models to access owned items
+
+        // Register dynamic relationships and eager loading
+        foreach ($allModels as $modelClass) {
+            if (class_exists($modelClass)) {
+                $modelClass::resolveRelationUsing('ownedItems', function ($thisModel) {
+                    return $thisModel->hasMany(\Sowailem\Ownable\Models\Ownership::class, 'owner_id', $thisModel->getKeyName())
+                        ->where('owner_type', $thisModel->getMorphClass())
+                        ->where('is_current', true)
+                        ->with('ownable');
+                });
+
+                $modelClass::addGlobalScope('eagerLoadOwnedItems', function ($builder) {
+                    $builder->with('ownedItems');
+                });
+            }
+        }
+
+        // Fallback for models not explicitly in config but may still be used
         \Illuminate\Database\Eloquent\Model::resolveRelationUsing('ownedItems', function ($thisModel) use ($allModels) {
             foreach ($allModels as $modelClass) {
                 if ($thisModel instanceof $modelClass) {
@@ -103,28 +123,6 @@ class OwnableServiceProvider extends ServiceProvider
                 }
             }
         });
-
-        $ownerModelMain = count($ownerModels) > 0 ? $ownerModels[0] : (count($ownableModels) > 0 ? $ownableModels[0] : null);
-
-        foreach ($ownableModels as $modelClass) {
-            if (class_exists($modelClass) && $ownerModelMain) {
-                $modelClass::macro($macroName, function () use ($ownerModelMain) {
-                    /** @var \Illuminate\Database\Eloquent\Model $this */
-                    return $this->morphToMany($ownerModelMain, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
-                        ->wherePivot('is_current', true)
-                        ->withPivot('is_current')
-                        ->withTimestamps();
-                });
-
-                // Also register a macro for ownership history
-                $modelClass::macro($macroName . 'History', function () use ($ownerModelMain) {
-                    /** @var \Illuminate\Database\Eloquent\Model $this */
-                    return $this->morphToMany($ownerModelMain, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
-                        ->withPivot('is_current')
-                        ->withTimestamps();
-                });
-            }
-        }
     }
 
     /**
