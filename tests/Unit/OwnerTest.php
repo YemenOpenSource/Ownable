@@ -16,7 +16,7 @@ class OwnerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->owner = new Owner();
+        $this->owner = app('ownable.owner');
     }
 
     /** @test */
