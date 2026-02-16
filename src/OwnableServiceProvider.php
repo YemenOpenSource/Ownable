@@ -91,36 +91,35 @@ class OwnableServiceProvider extends ServiceProvider
         $ownerModels = config('ownable.owner_models',[]);
         $macroName = config('ownable.macro_name', 'owner');
 
-        $ownerModels = array_unique(array_merge($ownerModels, $ownableModels));
+        $allModels = array_unique(array_merge($ownerModels, $ownableModels));
         // Register macro for owner models to access owned items
-        foreach ($ownerModels as $ownerModel) {
-            if (class_exists($ownerModel)) {
-                \Illuminate\Database\Eloquent\Model::resolveRelationUsing('ownedItems', function ($thisModel) use ($ownerModel) {
-                    if ($thisModel instanceof $ownerModel) {
-                        return $thisModel->hasMany(\Sowailem\Ownable\Models\Ownership::class, 'owner_id', $thisModel->getKeyName())
-                            ->where('owner_type', $thisModel->getMorphClass())
-                            ->where('is_current', true)
-                            ->with('ownable');
-                    }
-                    return null;
-                });
+        \Illuminate\Database\Eloquent\Model::resolveRelationUsing('ownedItems', function ($thisModel) use ($allModels) {
+            foreach ($allModels as $modelClass) {
+                if ($thisModel instanceof $modelClass) {
+                    return $thisModel->hasMany(\Sowailem\Ownable\Models\Ownership::class, 'owner_id', $thisModel->getKeyName())
+                        ->where('owner_type', $thisModel->getMorphClass())
+                        ->where('is_current', true)
+                        ->with('ownable');
+                }
             }
-        }
+        });
+
+        $ownerModelMain = count($ownerModels) > 0 ? $ownerModels[0] : (count($ownableModels) > 0 ? $ownableModels[0] : null);
 
         foreach ($ownableModels as $modelClass) {
-            if (class_exists($modelClass)) {
-                $modelClass::macro($macroName, function () use ($ownerModel) {
+            if (class_exists($modelClass) && $ownerModelMain) {
+                $modelClass::macro($macroName, function () use ($ownerModelMain) {
                     /** @var \Illuminate\Database\Eloquent\Model $this */
-                    return $this->morphToMany($ownerModel, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
+                    return $this->morphToMany($ownerModelMain, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
                         ->wherePivot('is_current', true)
                         ->withPivot('is_current')
                         ->withTimestamps();
                 });
 
                 // Also register a macro for ownership history
-                $modelClass::macro($macroName . 'History', function () use ($ownerModel) {
+                $modelClass::macro($macroName . 'History', function () use ($ownerModelMain) {
                     /** @var \Illuminate\Database\Eloquent\Model $this */
-                    return $this->morphToMany($ownerModel, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
+                    return $this->morphToMany($ownerModelMain, 'ownable', 'ownerships', 'ownable_id', 'owner_id')
                         ->withPivot('is_current')
                         ->withTimestamps();
                 });
